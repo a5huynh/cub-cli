@@ -1,0 +1,15 @@
+name: cub
+version: "0.1.0"
+author: Andrew Huynh <a5thuynh@gmail.com>
+about: Command-line Utility for Bear.
+subcommands:
+  - ls:
+      about: List notes.
+      args:
+        - limit:
+            short: l
+            help: Limit the number of notes printed.
+            takes_value: true
+        - text:
+            short: t
+            help: Additionally print full note text.

@@ -1,0 +1,10 @@
+[package]
+name = "cub"
+version = "0.1.0"
+authors = ["Andrew Huynh <a5thuynh@gmail.com>"]
+
+[dependencies]
+chrono = "0.4.4"
+clap = { version = "2.32.0", features = ["yaml"] }
+rusqlite = "0.13.0"
+term = "0.4.6"

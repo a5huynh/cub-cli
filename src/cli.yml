@@ -9,6 +9,11 @@ subcommands:
         - color:
             short: c
             help: Colorize notes based on their status (archived, trashed, etc.)
+        - filter:
+            short: f
+            help: Filter notes by status
+            takes_value: true
+            multiple: true
         - limit:
             short: l
             help: Limit the number of notes printed.

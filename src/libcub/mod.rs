@@ -29,23 +29,42 @@ pub fn connect_to_db() -> Connection {
     return Connection::open("data/database.sqlite").unwrap();
 }
 
+fn apply_filters(query: &str, filters: &Vec<NoteStatus>) -> String {
+    let mut filter_sql = Vec::new();
+    for filter in filters {
+        match filter {
+            NoteStatus::ARCHIVED => filter_sql.push("ZARCHIVED = 1"),
+            NoteStatus::TRASHED => filter_sql.push("ZTRASHED = 1"),
+            NoteStatus::NORMAL => filter_sql.push("(ZARCHIVED = 0 AND ZTRASHED = 0)"),
+        }
+    }
+
+    if filter_sql.len() > 0 {
+        return format!("{} WHERE {}", query, filter_sql.join(" OR "));
+    }
+
+    return String::from(query);
+}
+
 
 /// List all notes
-pub fn list_notes(conn: &Connection, limit: i32) -> Result<Vec<Note>, &'static str> {
+pub fn list_notes(conn: &Connection, filters: &Vec<NoteStatus>, limit: i32) -> Result<Vec<Note>, &'static str> {
 
+    let base = "SELECT
+            Z_PK,
+            ZTITLE,
+            ZSUBTITLE,
+            ZTEXT,
+            ZLASTEDITINGDEVICE,
+            strftime('%s', ZCREATIONDATE),
+            strftime('%s', ZMODIFICATIONDATE),
+            ZARCHIVED,
+            ZTRASHED
+        FROM ZSFNOTE";
+
+    let applied = apply_filters(&base, filters);
     let mut stmt = conn
-        .prepare("SELECT
-                Z_PK,
-                ZTITLE,
-                ZSUBTITLE,
-                ZTEXT,
-                ZLASTEDITINGDEVICE,
-                strftime('%s', ZCREATIONDATE),
-                strftime('%s', ZMODIFICATIONDATE),
-                ZARCHIVED,
-                ZTRASHED
-            FROM ZSFNOTE
-            LIMIT ?")
+        .prepare(format!("{} LIMIT ?", &applied.as_str()).as_str())
         .unwrap();
 
     let note_iter = stmt.query_map(&[&limit], |row| {

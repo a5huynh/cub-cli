@@ -7,13 +7,18 @@ extern crate term;
 use clap::App;
 use std::io::prelude::*;
 
+mod args;
+use args::{
+    parse_filters,
+    parse_limit,
+};
+
 mod libcub;
 use libcub::{
     connect_to_db,
     list_notes,
-    NoteStatus
+    NoteStatus,
 };
-
 
 fn main() {
     let yaml = load_yaml!("cli.yml");
@@ -23,18 +28,14 @@ fn main() {
     let conn = connect_to_db();
 
     let mut t = term::stdout().unwrap();
+
     // Parse command line args and determine which subcommand to execute.
     if let Some(matches) = matches.subcommand_matches("ls") {
 
-        let mut limit = 100;
-        if matches.is_present("limit") {
-            let limit_str = matches.value_of("limit").unwrap();
-            limit = limit_str.parse::<i32>().expect("Limit needs to be a number.");
-        }
+        let filters = parse_filters(matches);
+        let limit = parse_limit(matches);
 
-        let notes = list_notes(&conn, limit).unwrap();
-        for note in notes {
-
+        for note in list_notes(&conn, &filters, limit).unwrap() {
             // Color the notes depending on the note status
             if matches.is_present("color") {
                 match note.status {

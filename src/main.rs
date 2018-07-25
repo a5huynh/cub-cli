@@ -10,7 +10,8 @@ use std::io::prelude::*;
 mod libcub;
 use libcub::{
     connect_to_db,
-    list_notes
+    list_notes,
+    NoteStatus
 };
 
 
@@ -20,8 +21,10 @@ fn main() {
 
     // Attempt to detect and connect to the Bear sqlite database
     let conn = connect_to_db();
+
+    let mut t = term::stdout().unwrap();
+    // Parse command line args and determine which subcommand to execute.
     if let Some(matches) = matches.subcommand_matches("ls") {
-        let mut t = term::stdout().unwrap();
 
         let mut limit = 100;
         if matches.is_present("limit") {
@@ -32,16 +35,23 @@ fn main() {
         let notes = list_notes(&conn, limit).unwrap();
         for note in notes {
 
-            t.fg(term::color::GREEN).unwrap();
-            writeln!(t, "{}", note.title).unwrap();
+            // Color the notes depending on the note status
+            if matches.is_present("color") {
+                match note.status {
+                    NoteStatus::NORMAL => t.fg(term::color::WHITE).unwrap(),
+                    NoteStatus::TRASHED => t.fg(term::color::RED).unwrap(),
+                    NoteStatus::ARCHIVED => t.fg(term::color::GREEN).unwrap(),
+                }
+            }
 
+            writeln!(t, "{}", note.title).unwrap();
             if matches.is_present("text") {
-                t.fg(term::color::BRIGHT_WHITE).unwrap();
                 writeln!(t, "{}", note.subtitle).unwrap();
             }
 
-            t.reset().unwrap();
-
+            if matches.is_present("color") {
+                t.reset().unwrap();
+            }
         }
     }
 }

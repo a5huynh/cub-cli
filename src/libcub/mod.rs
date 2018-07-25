@@ -3,6 +3,12 @@ extern crate chrono;
 use chrono::prelude::*;
 use rusqlite::{ Connection };
 
+#[derive(Debug)]
+pub enum NoteStatus {
+    ARCHIVED,
+    TRASHED,
+    NORMAL
+}
 
 #[derive(Debug)]
 pub struct Note {
@@ -13,6 +19,7 @@ pub struct Note {
     pub last_editing_device: String,
     pub creation_date: NaiveDateTime,
     pub modification_date: NaiveDateTime,
+    pub status: NoteStatus
 }
 
 
@@ -34,11 +41,23 @@ pub fn list_notes(conn: &Connection, limit: i32) -> Result<Vec<Note>, &'static s
                 ZTEXT,
                 ZLASTEDITINGDEVICE,
                 strftime('%s', ZCREATIONDATE),
-                strftime('%s', ZMODIFICATIONDATE)
-            FROM ZSFNOTE LIMIT ?")
+                strftime('%s', ZMODIFICATIONDATE),
+                ZARCHIVED,
+                ZTRASHED
+            FROM ZSFNOTE
+            LIMIT ?")
         .unwrap();
 
     let note_iter = stmt.query_map(&[&limit], |row| {
+        let mut status = NoteStatus::NORMAL;
+        if row.get::<i32, i32>(7) == 1 {
+            // Is it archived?
+            status = NoteStatus::ARCHIVED;
+        } else if row.get::<i32, i32>(8) == 1 {
+            // Is it trashed?
+            status = NoteStatus::TRASHED;
+        }
+
         Note {
             pk: row.get(0),
             title: row.get(1),
@@ -52,7 +71,8 @@ pub fn list_notes(conn: &Connection, limit: i32) -> Result<Vec<Note>, &'static s
             modification_date: NaiveDateTime::from_timestamp(
                 row.get_checked(6).unwrap_or(0),
                 0
-            )
+            ),
+            status: status
         }
     }).unwrap();
 

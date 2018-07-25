@@ -6,6 +6,9 @@ subcommands:
   - ls:
       about: List notes.
       args:
+        - color:
+            short: c
+            help: Colorize notes based on their status (archived, trashed, etc.)
         - limit:
             short: l
             help: Limit the number of notes printed.

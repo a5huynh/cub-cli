@@ -45,7 +45,7 @@ fn main() {
                 }
             }
 
-            writeln!(t, "{}", note.title).unwrap();
+            writeln!(t, "{:-4} {}", note.pk, note.title).unwrap();
             if matches.is_present("text") {
                 writeln!(t, "{}", note.subtitle).unwrap();
             }

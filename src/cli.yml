@@ -2,6 +2,12 @@ name: cub
 version: "0.1.0"
 author: Andrew Huynh <a5thuynh@gmail.com>
 about: Command-line Utility for Bear.
+args:
+  - db:
+      help: Bear data file to pull data from.
+      short: d
+      global: true
+      takes_value: true
 subcommands:
   - ls:
       about: List notes.

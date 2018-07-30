@@ -1,5 +1,6 @@
 use rusqlite::{ Connection };
 
+pub mod constants;
 pub mod note;
 use self::note::{ Note, NoteStatus };
 
@@ -16,9 +17,8 @@ const BASE_QUERY: &'static str = "SELECT
     FROM ZSFNOTE";
 
 /// Detect and connect to the Bear application sqlite database.
-pub fn connect_to_db() -> Connection {
-    // TODO: Point this at the real bear application sqlite db.
-    return Connection::open("data/database.sqlite").unwrap();
+pub fn connect_to_db(datafile: &str) -> Connection {
+    return Connection::open(datafile).unwrap();
 }
 
 fn apply_filters(query: &str, filters: &Vec<NoteStatus>) -> String {

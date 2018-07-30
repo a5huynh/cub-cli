@@ -1,6 +1,10 @@
 extern crate chrono;
 #[macro_use]
 extern crate clap;
+extern crate dirs;
+#[macro_use]
+extern crate log;
+extern crate env_logger;
 extern crate rusqlite;
 extern crate term;
 
@@ -19,15 +23,21 @@ use libcub::{
     find_note_by_id,
     list_notes
 };
+use libcub::constants::{ APP_ROOT, DB_PATH };
 use libcub::note::NoteStatus;
 
 fn main() {
+    env_logger::init();
     let yaml = load_yaml!("cli.yml");
     let matches = App::from_yaml(yaml).get_matches();
 
-    // Attempt to detect and connect to the Bear sqlite database
-    let conn = connect_to_db();
+    // Find the path to the Bear sqlite file.
+    let default_db_path = dirs::home_dir().unwrap().join(APP_ROOT).join(DB_PATH);
+    let db_opt = matches.value_of("db").unwrap_or(default_db_path.to_str().unwrap());
+    info!("db path set to: {}", db_opt);
 
+    // Attempt to detect and connect to the Bear sqlite database
+    let conn = connect_to_db(db_opt);
     let mut t = term::stdout().unwrap();
 
     // Parse command line args and determine which subcommand to execute.

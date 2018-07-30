@@ -12,6 +12,10 @@ subcommands:
   - ls:
       about: List notes.
       args:
+        - all:
+            short: a
+            help: Show *all* notes.
+            conflicts_with: limit
         - color:
             short: c
             help: Colorize notes based on their status (archived, trashed, etc.)
@@ -24,6 +28,7 @@ subcommands:
             short: l
             help: Limit the number of notes printed.
             takes_value: true
+            conflicts_with: all
         - text:
             short: t
             help: Additionally print full note text.

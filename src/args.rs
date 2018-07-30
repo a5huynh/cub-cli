@@ -2,6 +2,11 @@
 use clap;
 use libcub::note::NoteStatus;
 
+pub enum Limit {
+    INFINITE,
+    FINITE(i32)
+}
+
 /// Create a list of filters from the command line args.
 pub fn parse_filters(matches: &clap::ArgMatches) -> Vec<NoteStatus> {
     let mut filters = Vec::new();
@@ -23,13 +28,17 @@ pub fn parse_filters(matches: &clap::ArgMatches) -> Vec<NoteStatus> {
 }
 
 /// Parse limit arg
-pub fn parse_limit(matches: &clap::ArgMatches) -> i32 {
-    if matches.is_present("limit") {
-        let limit_str = matches.value_of("limit").unwrap();
-        return limit_str.parse::<i32>().unwrap_or(100);
+pub fn parse_limit(matches: &clap::ArgMatches) -> Limit {
+    if matches.is_present("all") {
+        return Limit::INFINITE;
     }
 
-    return 100;
+    if matches.is_present("limit") {
+        let limit_str = matches.value_of("limit").unwrap();
+        return Limit::FINITE(limit_str.parse::<i32>().unwrap_or(100));
+    }
+
+    return Limit::FINITE(100);
 }
 
 #[cfg(test)]

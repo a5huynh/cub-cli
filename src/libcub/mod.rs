@@ -4,6 +4,8 @@ pub mod constants;
 pub mod note;
 use self::note::{ Note, NoteStatus };
 
+use args::Limit;
+
 const BASE_QUERY: &'static str = "SELECT
         Z_PK,
         ZTITLE,
@@ -52,20 +54,33 @@ pub fn find_note_by_id(conn: &Connection, note_id: i32) -> Result<Note, &'static
 
 
 /// List all notes
-pub fn list_notes(conn: &Connection, filters: &Vec<NoteStatus>, limit: i32) -> Result<Vec<Note>, &'static str> {
+pub fn list_notes(conn: &Connection, filters: &Vec<NoteStatus>, limit: Limit) -> Result<Vec<Note>, &'static str> {
     let applied = apply_filters(&BASE_QUERY, filters);
-    let mut stmt = conn
-        .prepare(format!("{} LIMIT ?", &applied.as_str()).as_str())
-        .unwrap();
 
-    let note_iter = stmt.query_map(&[&limit], |row| {
-        Note::from_sql(row)
-    }).unwrap();
+    let mut notes = Vec::new();
 
-    let mut new = Vec::new();
-    for note in note_iter {
-        new.push(note.unwrap());
+    match limit {
+        // Show all notes
+        Limit::INFINITE => {
+            let mut stmt = conn.prepare(&applied.as_str())
+                .unwrap();
+            let note_iter = stmt.query_map(&[], |row| Note::from_sql(row))
+                .unwrap();
+            for note in note_iter {
+                notes.push(note.unwrap());
+            }
+        },
+        // Apply limit to number of notes returned
+        Limit::FINITE(val) => {
+            let mut stmt = conn.prepare(format!("{} LIMIT ?", &applied.as_str()).as_str())
+                .unwrap();
+            let note_iter = stmt.query_map(&[&val], |row| Note::from_sql(row))
+                .unwrap();
+            for note in note_iter {
+                notes.push(note.unwrap());
+            }
+        }
     }
 
-    return Ok(new);
+    return Ok(notes);
 }

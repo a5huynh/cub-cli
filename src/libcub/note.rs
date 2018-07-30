@@ -2,7 +2,7 @@ extern crate chrono;
 use chrono::prelude::*;
 use rusqlite::{ Row };
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum NoteStatus {
     ARCHIVED,
     TRASHED,

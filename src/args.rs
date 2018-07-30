@@ -26,7 +26,7 @@ pub fn parse_filters(matches: &clap::ArgMatches) -> Vec<NoteStatus> {
 pub fn parse_limit(matches: &clap::ArgMatches) -> i32 {
     if matches.is_present("limit") {
         let limit_str = matches.value_of("limit").unwrap();
-        return limit_str.parse::<i32>().expect("Limit needs to be a number.");
+        return limit_str.parse::<i32>().unwrap_or(100);
     }
 
     return 100;

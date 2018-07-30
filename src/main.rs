@@ -30,15 +30,17 @@ fn main() {
     env_logger::init();
     let yaml = load_yaml!("cli.yml");
     let matches = App::from_yaml(yaml).get_matches();
+    let mut t = term::stdout().unwrap();
 
     // Find the path to the Bear sqlite file.
+    // I assume that the sqlite file is in the same place for all installs,
+    // but make that option configurable.
     let default_db_path = dirs::home_dir().unwrap().join(APP_ROOT).join(DB_PATH);
     let db_opt = matches.value_of("db").unwrap_or(default_db_path.to_str().unwrap());
     info!("db path set to: {}", db_opt);
 
     // Attempt to detect and connect to the Bear sqlite database
     let conn = connect_to_db(db_opt);
-    let mut t = term::stdout().unwrap();
 
     // Parse command line args and determine which subcommand to execute.
     if let Some(matches) = matches.subcommand_matches("ls") {
@@ -69,7 +71,14 @@ fn main() {
 
     } else if let Some(matches) = matches.subcommand_matches("show") {
 
-        let note_id = matches.value_of("NOTE").unwrap().parse::<i32>().unwrap();
+        let note_id: i32 = match matches.value_of("NOTE").unwrap().parse() {
+            Ok(value) => value,
+            Err(_) => {
+                writeln!(t, "Note id must be a valid integer.").unwrap();
+                ::std::process::exit(1);
+            }
+        };
+
         let note = find_note_by_id(&conn, note_id).unwrap();
         writeln!(t, "{}", note.text).unwrap();
 

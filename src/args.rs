@@ -1,6 +1,6 @@
 /// Helper functions to parse CLI args
 use clap;
-use libcub::NoteStatus;
+use libcub::note::NoteStatus;
 
 /// Create a list of filters from the command line args.
 pub fn parse_filters(matches: &clap::ArgMatches) -> Vec<NoteStatus> {

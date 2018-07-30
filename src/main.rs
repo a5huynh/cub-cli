@@ -16,9 +16,10 @@ use args::{
 mod libcub;
 use libcub::{
     connect_to_db,
-    list_notes,
-    NoteStatus,
+    find_note_by_id,
+    list_notes
 };
+use libcub::note::NoteStatus;
 
 fn main() {
     let yaml = load_yaml!("cli.yml");

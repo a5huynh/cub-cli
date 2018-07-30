@@ -21,3 +21,10 @@ subcommands:
         - text:
             short: t
             help: Additionally print full note text.
+  - show:
+      about: Show a single note.
+      args:
+        - NOTE:
+            help: Note ID
+            required: true
+            index: 1

@@ -51,9 +51,17 @@ fn main() {
                 writeln!(t, "{}", note.subtitle).unwrap();
             }
 
+            // Unset any coloring we did
             if matches.is_present("color") {
                 t.reset().unwrap();
             }
         }
+
+    } else if let Some(matches) = matches.subcommand_matches("show") {
+
+        let note_id = matches.value_of("NOTE").unwrap().parse::<i32>().unwrap();
+        let note = find_note_by_id(&conn, note_id).unwrap();
+        writeln!(t, "{}", note.text).unwrap();
+
     }
 }

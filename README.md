@@ -7,9 +7,12 @@ to the notes, tags, and media stored within your bear writer application.
 
 ## TODO
 - [ ] List notes.
-    - [ ] Configure rendering options (limit, w/ text, w/ creation date, etc.)
-    - [ ] Filter options
-- [ ] View a single note.
+    - [ ] Configure rendering options
+      - [x] limit
+      - [ ] w/ text.
+      - [ ] w/ creation date.
+    - [x] Filter options
+- [x] View a single note.
 
 
 ## Installing
@@ -22,7 +25,7 @@ to the notes, tags, and media stored within your bear writer application.
 Here is how to do some common things with the `cub` CLI. Also check out
 `cub --help` to see all command/options you can use.
 
-### Listing out notes
+### Listing out notes.
 
     # List _all_ notes.
     > cub ls
@@ -36,6 +39,12 @@ Here is how to do some common things with the `cub` CLI. Also check out
     # entirety of the text to the terminal.
     > cub ls --text
     > cub ls -t
+
+### View a note.
+
+    # Notes are prefixed with their ID in the `ls` command. Use that ID
+    # here to output the full text.
+    > cub show 571
 
 
 ## Building from scratch

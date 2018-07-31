@@ -39,3 +39,5 @@ subcommands:
             help: Note ID
             required: true
             index: 1
+  - tags:
+      about: Show tags

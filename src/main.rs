@@ -21,7 +21,8 @@ mod libcub;
 use libcub::{
     connect_to_db,
     find_note_by_id,
-    list_notes
+    list_notes,
+    list_tags,
 };
 use libcub::constants::{ APP_ROOT, DB_PATH };
 use libcub::note::NoteStatus;
@@ -82,5 +83,9 @@ fn main() {
         let note = find_note_by_id(&conn, note_id).unwrap();
         writeln!(t, "{}", note.text).unwrap();
 
+    } else if let Some(_) = matches.subcommand_matches("tags") {
+        for tag in list_tags(&conn).unwrap() {
+            writeln!(t, "{}", tag.title).unwrap();
+        }
     }
 }

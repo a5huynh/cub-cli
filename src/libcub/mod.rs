@@ -2,11 +2,11 @@ use rusqlite::{ Connection };
 
 pub mod constants;
 pub mod note;
-use self::note::{ Note, NoteStatus };
+use self::note::{ Note, NoteStatus, Tag };
 
 use args::Limit;
 
-const BASE_QUERY: &'static str = "SELECT
+const BASE_NOTE_QUERY: &'static str = "SELECT
         Z_PK,
         ZTITLE,
         ZSUBTITLE,
@@ -17,6 +17,8 @@ const BASE_QUERY: &'static str = "SELECT
         ZARCHIVED,
         ZTRASHED
     FROM ZSFNOTE";
+
+const BASE_TAG_QUERY: &'static str = "SELECT Z_PK, ZTITLE FROM ZSFNOTETAG ORDER BY ZTITLE";
 
 /// Detect and connect to the Bear application sqlite database.
 pub fn connect_to_db(datafile: &str) -> Connection {
@@ -43,7 +45,7 @@ fn apply_filters(query: &str, filters: &Vec<NoteStatus>) -> String {
 
 /// Find a single note by ID
 pub fn find_note_by_id(conn: &Connection, note_id: i32) -> Result<Note, &'static str> {
-    let mut stmt = conn.prepare(format!("{} WHERE Z_PK =?", BASE_QUERY).as_str()).unwrap();
+    let mut stmt = conn.prepare(format!("{} WHERE Z_PK =?", BASE_NOTE_QUERY).as_str()).unwrap();
     let note = stmt.query_row(&[&note_id], |row| {
         Note::from_sql(row)
     }).unwrap();
@@ -55,7 +57,7 @@ pub fn find_note_by_id(conn: &Connection, note_id: i32) -> Result<Note, &'static
 
 /// List all notes
 pub fn list_notes(conn: &Connection, filters: &Vec<NoteStatus>, limit: Limit) -> Result<Vec<Note>, &'static str> {
-    let applied = apply_filters(&BASE_QUERY, filters);
+    let applied = apply_filters(&BASE_NOTE_QUERY, filters);
 
     let mut notes = Vec::new();
 
@@ -83,4 +85,17 @@ pub fn list_notes(conn: &Connection, filters: &Vec<NoteStatus>, limit: Limit) ->
     }
 
     return Ok(notes);
+}
+
+
+pub fn list_tags(conn: &Connection) -> Result<Vec<Tag>, &'static str> {
+    let mut stmt = conn.prepare(BASE_TAG_QUERY).unwrap();
+    let mut tags = Vec::new();
+
+    let tag_iter = stmt.query_map(&[], |row| Tag::from_sql(row)).unwrap();
+    for tag in tag_iter {
+        tags.push(tag.unwrap());
+    }
+
+    return Ok(tags);
 }

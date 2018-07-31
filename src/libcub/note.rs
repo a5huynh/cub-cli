@@ -50,3 +50,17 @@ impl Note {
         }
     }
 }
+
+pub struct Tag {
+    pub pk: u32,
+    pub title: String,
+}
+
+impl Tag {
+    pub fn from_sql(row: &Row) -> Tag {
+        Tag {
+            pk: row.get(0),
+            title: row.get(1)
+        }
+    }
+}

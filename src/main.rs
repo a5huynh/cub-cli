@@ -60,7 +60,7 @@ fn main() {
             }
 
             writeln!(t, "{:-4} {}", note.pk, note.title).unwrap();
-            if matches.is_present("text") {
+            if matches.is_present("full") {
                 writeln!(t, "{}", note.subtitle).unwrap();
             }
 

@@ -24,14 +24,13 @@ subcommands:
             help: Filter notes by status
             takes_value: true
             multiple: true
+        - full:
+            help: Also print out note text
         - limit:
             short: l
             help: Limit the number of notes printed.
             takes_value: true
             conflicts_with: all
-        - text:
-            short: t
-            help: Additionally print full note text.
   - show:
       about: Show a single note.
       args:

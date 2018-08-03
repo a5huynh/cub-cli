@@ -9,10 +9,12 @@ to the notes, tags, and media stored within your bear writer application.
 - [ ] List notes.
     - [ ] Configure rendering options
       - [x] limit
-      - [ ] w/ text.
-      - [ ] w/ creation date.
-    - [x] Filter options
+      - [x] w/ text.
+      - [ ] w/ creation/modification date.
+    - [x] Filter by note status.
+    - [ ] Filter by tag.
 - [x] View a single note.
+- [ ] View fun stats for all notes/note?
 
 
 ## Installing

@@ -2,6 +2,7 @@
 name = "cub"
 version = "0.1.0"
 authors = ["Andrew Huynh <a5thuynh@gmail.com>"]
+publish = false
 
 [dependencies]
 chrono = "0.4.4"

@@ -45,7 +45,7 @@ pub fn parse_limit(matches: &clap::ArgMatches) -> Limit {
 mod tests {
     use clap::App;
     use libcub::note::NoteStatus;
-    use args::{ parse_filters, parse_limit };
+    use args::{ Limit, parse_filters, parse_limit };
 
     #[test]
     fn test_parse_filters() {
@@ -69,7 +69,10 @@ mod tests {
         let subcommand = matches.subcommand_matches("ls").unwrap();
         let limit = parse_limit(subcommand);
 
-        assert_eq!(limit, 42);
+        match limit {
+            Limit::FINITE(val) => assert_eq!(val, 42),
+            Limit::INFINITE => {}
+        }
     }
 
     #[test]
@@ -82,6 +85,9 @@ mod tests {
         let subcommand = matches.subcommand_matches("ls").unwrap();
         let limit = parse_limit(subcommand);
 
-        assert_eq!(limit, 100);
+        match limit {
+            Limit::FINITE(val) => assert_eq!(val, 100),
+            Limit::INFINITE => {}
+        }
     }
 }

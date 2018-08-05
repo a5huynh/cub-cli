@@ -1,3 +1,7 @@
+[![Build Status](https://travis-ci.org/a5huynh/cub-cli.svg?branch=master)](https://travis-ci.org/a5huynh/cub-cli)
+
+[![license: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 ## CUB
 
 CUB stands for Command-line Utility for [Bear][bear-app] and offers a simple CLI interface

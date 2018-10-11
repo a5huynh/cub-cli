@@ -1,10 +1,15 @@
+extern crate chrono;
+extern crate rusqlite;
 use rusqlite::{ Connection };
 
 pub mod constants;
 pub mod note;
 use self::note::{ Note, NoteStatus, Tag };
 
-use args::Limit;
+pub enum Limit {
+    INFINITE,
+    FINITE(i32)
+}
 
 const BASE_NOTE_QUERY: &'static str = "SELECT
         Z_PK,

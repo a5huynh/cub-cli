@@ -1,11 +1,9 @@
-extern crate chrono;
 #[macro_use]
 extern crate clap;
 extern crate dirs;
 #[macro_use]
 extern crate log;
 extern crate env_logger;
-extern crate rusqlite;
 extern crate term;
 
 use clap::App;
@@ -17,7 +15,7 @@ use args::{
     parse_limit,
 };
 
-mod libcub;
+extern crate libcub;
 use libcub::{
     connect_to_db,
     find_note_by_id,

@@ -35,7 +35,7 @@ fn main() {
     // I assume that the sqlite file is in the same place for all installs,
     // but make that option configurable.
     let default_db_path = dirs::home_dir().unwrap().join(APP_ROOT).join(DB_PATH);
-    let db_opt = matches.value_of("db").unwrap_or(default_db_path.to_str().unwrap());
+    let db_opt = matches.value_of("db").unwrap_or_else(|| default_db_path.to_str().unwrap());
     info!("db path set to: {}", db_opt);
 
     // Attempt to detect and connect to the Bear sqlite database
@@ -47,7 +47,7 @@ fn main() {
         let filters = parse_filters(matches);
         let limit = parse_limit(matches);
 
-        for note in list_notes(&conn, &filters, limit).unwrap() {
+        for note in list_notes(&conn, &filters, &limit).unwrap() {
             // Color the notes depending on the note status
             if matches.is_present("color") {
                 match note.status {
@@ -81,7 +81,7 @@ fn main() {
         let note = find_note_by_id(&conn, note_id).unwrap();
         writeln!(t, "{}", note.text).unwrap();
 
-    } else if let Some(_) = matches.subcommand_matches("tags") {
+    } else if matches.subcommand_matches("tags").is_some() {
         for tag in list_tags(&conn).unwrap() {
             writeln!(t, "{}", tag.title).unwrap();
         }

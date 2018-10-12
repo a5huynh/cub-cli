@@ -22,7 +22,7 @@ use libcub::{
     list_notes,
     list_tags,
 };
-use libcub::constants::{ APP_ROOT, DB_PATH };
+use libcub::constants::{ find_db };
 use libcub::note::NoteStatus;
 
 fn main() {
@@ -34,8 +34,16 @@ fn main() {
     // Find the path to the Bear sqlite file.
     // I assume that the sqlite file is in the same place for all installs,
     // but make that option configurable.
-    let default_db_path = dirs::home_dir().unwrap().join(APP_ROOT).join(DB_PATH);
-    let db_opt = matches.value_of("db").unwrap_or_else(|| default_db_path.to_str().unwrap());
+    let db_file_path = match find_db() {
+        Ok(db_path) => db_path,
+        Err(message) => {
+            eprint!("{}", message);
+            return;
+        }
+    };
+
+    let db_opt = matches.value_of("db").unwrap_or_else(|| db_file_path.as_str());
+
     info!("db path set to: {}", db_opt);
 
     // Attempt to detect and connect to the Bear sqlite database

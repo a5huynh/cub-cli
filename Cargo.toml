@@ -12,3 +12,11 @@ dirs = "1.0.2"
 log = "0.4.3"
 rusqlite = "0.13.0"
 term = "0.4.6"
+
+[lib]
+name = "libcub"
+path = "src/libcub/mod.rs"
+
+[[bin]]
+name = "cub"
+path = "src/main.rs"

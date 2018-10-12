@@ -1,11 +1,9 @@
-extern crate chrono;
 #[macro_use]
 extern crate clap;
 extern crate dirs;
 #[macro_use]
 extern crate log;
 extern crate env_logger;
-extern crate rusqlite;
 extern crate term;
 
 use clap::App;
@@ -17,14 +15,14 @@ use args::{
     parse_limit,
 };
 
-mod libcub;
+extern crate libcub;
 use libcub::{
     connect_to_db,
     find_note_by_id,
     list_notes,
     list_tags,
 };
-use libcub::constants::{ APP_ROOT, DB_PATH };
+use libcub::constants::{ find_db };
 use libcub::note::NoteStatus;
 
 fn main() {
@@ -36,8 +34,16 @@ fn main() {
     // Find the path to the Bear sqlite file.
     // I assume that the sqlite file is in the same place for all installs,
     // but make that option configurable.
-    let default_db_path = dirs::home_dir().unwrap().join(APP_ROOT).join(DB_PATH);
-    let db_opt = matches.value_of("db").unwrap_or(default_db_path.to_str().unwrap());
+    let db_file_path = match find_db() {
+        Ok(db_path) => db_path,
+        Err(message) => {
+            eprint!("{}", message);
+            return;
+        }
+    };
+
+    let db_opt = matches.value_of("db").unwrap_or_else(|| db_file_path.as_str());
+
     info!("db path set to: {}", db_opt);
 
     // Attempt to detect and connect to the Bear sqlite database
@@ -49,7 +55,7 @@ fn main() {
         let filters = parse_filters(matches);
         let limit = parse_limit(matches);
 
-        for note in list_notes(&conn, &filters, limit).unwrap() {
+        for note in list_notes(&conn, &filters, &limit).unwrap() {
             // Color the notes depending on the note status
             if matches.is_present("color") {
                 match note.status {
@@ -83,7 +89,7 @@ fn main() {
         let note = find_note_by_id(&conn, note_id).unwrap();
         writeln!(t, "{}", note.text).unwrap();
 
-    } else if let Some(_) = matches.subcommand_matches("tags") {
+    } else if matches.subcommand_matches("tags").is_some() {
         for tag in list_tags(&conn).unwrap() {
             writeln!(t, "{}", tag.title).unwrap();
         }

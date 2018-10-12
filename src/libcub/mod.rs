@@ -1,12 +1,17 @@
+extern crate chrono;
+extern crate rusqlite;
 use rusqlite::{ Connection };
 
 pub mod constants;
 pub mod note;
 use self::note::{ Note, NoteStatus, Tag };
 
-use args::Limit;
+pub enum Limit {
+    INFINITE,
+    FINITE(i32)
+}
 
-const BASE_NOTE_QUERY: &'static str = "SELECT
+const BASE_NOTE_QUERY: &str = "SELECT
         Z_PK,
         ZTITLE,
         ZSUBTITLE,
@@ -18,14 +23,14 @@ const BASE_NOTE_QUERY: &'static str = "SELECT
         ZTRASHED
     FROM ZSFNOTE";
 
-const BASE_TAG_QUERY: &'static str = "SELECT Z_PK, ZTITLE FROM ZSFNOTETAG ORDER BY ZTITLE";
+const BASE_TAG_QUERY: &str = "SELECT Z_PK, ZTITLE FROM ZSFNOTETAG ORDER BY ZTITLE";
 
 /// Detect and connect to the Bear application sqlite database.
 pub fn connect_to_db(datafile: &str) -> Connection {
-    return Connection::open(datafile).unwrap();
+    Connection::open(datafile).unwrap()
 }
 
-fn apply_filters(query: &str, filters: &Vec<NoteStatus>) -> String {
+fn apply_filters(query: &str, filters: &[NoteStatus]) -> String {
     let mut filter_sql = Vec::new();
     for filter in filters {
         match filter {
@@ -35,11 +40,11 @@ fn apply_filters(query: &str, filters: &Vec<NoteStatus>) -> String {
         }
     }
 
-    if filter_sql.len() > 0 {
+    if !filter_sql.is_empty() {
         return format!("{} WHERE {}", query, filter_sql.join(" OR "));
     }
 
-    return String::from(query);
+    String::from(query)
 }
 
 
@@ -50,13 +55,12 @@ pub fn find_note_by_id(conn: &Connection, note_id: i32) -> Result<Note, &'static
         Note::from_sql(row)
     }).unwrap();
 
-    return Ok(note);
-
+    Ok(note)
 }
 
 
 /// List all notes
-pub fn list_notes(conn: &Connection, filters: &Vec<NoteStatus>, limit: Limit) -> Result<Vec<Note>, &'static str> {
+pub fn list_notes(conn: &Connection, filters: &[NoteStatus], limit: &Limit) -> Result<Vec<Note>, &'static str> {
     let applied = apply_filters(&BASE_NOTE_QUERY, filters);
 
     let mut notes = Vec::new();
@@ -76,7 +80,7 @@ pub fn list_notes(conn: &Connection, filters: &Vec<NoteStatus>, limit: Limit) ->
         Limit::FINITE(val) => {
             let mut stmt = conn.prepare(format!("{} LIMIT ?", &applied.as_str()).as_str())
                 .unwrap();
-            let note_iter = stmt.query_map(&[&val], |row| Note::from_sql(row))
+            let note_iter = stmt.query_map(&[val], |row| Note::from_sql(row))
                 .unwrap();
             for note in note_iter {
                 notes.push(note.unwrap());
@@ -84,7 +88,7 @@ pub fn list_notes(conn: &Connection, filters: &Vec<NoteStatus>, limit: Limit) ->
         }
     }
 
-    return Ok(notes);
+    Ok(notes)
 }
 
 
@@ -97,5 +101,5 @@ pub fn list_tags(conn: &Connection) -> Result<Vec<Tag>, &'static str> {
         tags.push(tag.unwrap());
     }
 
-    return Ok(tags);
+    Ok(tags)
 }

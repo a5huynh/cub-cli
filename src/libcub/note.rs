@@ -46,7 +46,7 @@ impl Note {
                 row.get_checked(6).unwrap_or(0),
                 0
             ),
-            status: status
+            status
         }
     }
 }

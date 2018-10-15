@@ -31,6 +31,11 @@ subcommands:
             help: Limit the number of notes printed.
             takes_value: true
             conflicts_with: all
+        - tags:
+            short: t
+            help: Filter notes by tag
+            takes_value: true
+            multiple: true
   - show:
       about: Show a single note.
       args:

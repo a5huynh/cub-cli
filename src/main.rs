@@ -13,6 +13,7 @@ mod args;
 use args::{
     parse_filters,
     parse_limit,
+    parse_tags,
 };
 
 extern crate libcub;
@@ -54,8 +55,9 @@ fn main() {
 
         let filters = parse_filters(matches);
         let limit = parse_limit(matches);
+        let tags = parse_tags(matches);
 
-        for note in list_notes(&conn, &filters, &limit).unwrap() {
+        for note in list_notes(&conn, &filters, &tags, &limit).unwrap() {
             // Color the notes depending on the note status
             if matches.is_present("color") {
                 match note.status {
@@ -65,7 +67,7 @@ fn main() {
                 }
             }
 
-            writeln!(t, "{:-4} {}", note.pk, note.title).unwrap();
+            writeln!(t, "{}", note).unwrap();
             if matches.is_present("full") {
                 writeln!(t, "{}", note.subtitle).unwrap();
             }

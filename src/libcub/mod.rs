@@ -17,8 +17,8 @@ const BASE_NOTE_QUERY: &str = "SELECT
         ZSUBTITLE,
         ZTEXT,
         ZLASTEDITINGDEVICE,
-        strftime('%s', ZCREATIONDATE),
-        strftime('%s', ZMODIFICATIONDATE),
+        datetime(ZCREATIONDATE, 'unixepoch', '+31 years'),
+        datetime(ZMODIFICATIONDATE, 'unixepoch', '+31 years'),
         ZARCHIVED,
         ZTRASHED
     FROM ZSFNOTE";
@@ -91,7 +91,7 @@ pub fn list_notes(conn: &Connection, filters: &[NoteStatus], limit: &Limit) -> R
     Ok(notes)
 }
 
-
+/// List all tags
 pub fn list_tags(conn: &Connection) -> Result<Vec<Tag>, &'static str> {
     let mut stmt = conn.prepare(BASE_TAG_QUERY).unwrap();
     let mut tags = Vec::new();

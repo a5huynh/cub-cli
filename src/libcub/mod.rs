@@ -24,14 +24,20 @@ const BASE_NOTE_QUERY: &str = "SELECT
     FROM ZSFNOTE";
 
 const BASE_TAG_QUERY: &str = "SELECT Z_PK, ZTITLE FROM ZSFNOTETAG ORDER BY ZTITLE";
+const BASE_NOTE_TAG_FILTER: &str = "SELECT
+    Z_6NOTES FROM Z_6TAGS
+    WHERE Z_13TAGS IN";
+
 
 /// Detect and connect to the Bear application sqlite database.
 pub fn connect_to_db(datafile: &str) -> Connection {
     Connection::open(datafile).unwrap()
 }
 
-fn apply_filters(query: &str, filters: &[NoteStatus]) -> String {
+fn apply_filters(query: &str, filters: &[NoteStatus], tags: &[String]) -> String {
     let mut filter_sql = Vec::new();
+    let mut query_str = String::from(query);
+
     for filter in filters {
         match filter {
             NoteStatus::ARCHIVED => filter_sql.push("ZARCHIVED = 1"),
@@ -41,10 +47,24 @@ fn apply_filters(query: &str, filters: &[NoteStatus]) -> String {
     }
 
     if !filter_sql.is_empty() {
-        return format!("{} WHERE {}", query, filter_sql.join(" OR "));
+        query_str = format!("{} WHERE {}", query, filter_sql.join(" OR "));
     }
 
-    String::from(query)
+    if !tags.is_empty() {
+        let tag_filter = format!(
+            "Z_PK IN ({} (SELECT Z_PK FROM ZSFNOTETAG WHERE ZTITLE IN (\"{}\")))",
+            BASE_NOTE_TAG_FILTER,
+            tags.join("\",\"")
+        );
+
+        if !filter_sql.is_empty() {
+            query_str = format!("{} AND ({})", query_str, tag_filter);
+        } else {
+            query_str = format!("{} WHERE ({})", query_str, tag_filter);
+        }
+    }
+
+    query_str
 }
 
 
@@ -60,8 +80,13 @@ pub fn find_note_by_id(conn: &Connection, note_id: i32) -> Result<Note, &'static
 
 
 /// List all notes
-pub fn list_notes(conn: &Connection, filters: &[NoteStatus], limit: &Limit) -> Result<Vec<Note>, &'static str> {
-    let applied = apply_filters(&BASE_NOTE_QUERY, filters);
+pub fn list_notes(
+    conn: &Connection,
+    filters: &[NoteStatus],
+    tags: &[String],
+    limit: &Limit
+) -> Result<Vec<Note>, &'static str> {
+    let applied = apply_filters(&BASE_NOTE_QUERY, filters, tags);
 
     let mut notes = Vec::new();
 

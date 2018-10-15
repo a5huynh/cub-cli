@@ -1,6 +1,7 @@
 extern crate chrono;
 use chrono::prelude::*;
 use rusqlite::{ Row };
+use std::fmt;
 
 #[derive(Debug, PartialEq)]
 pub enum NoteStatus {
@@ -8,6 +9,17 @@ pub enum NoteStatus {
     TRASHED,
     NORMAL
 }
+
+impl fmt::Display for NoteStatus {
+    fn fmt(&self, f:&mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            NoteStatus::ARCHIVED => write!(f, "A"),
+            NoteStatus::TRASHED => write!(f, "T"),
+            NoteStatus::NORMAL => write!(f, "."),
+        }
+    }
+}
+
 
 #[derive(Debug)]
 pub struct Note {

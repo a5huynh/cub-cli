@@ -24,9 +24,11 @@ const BASE_NOTE_QUERY: &str = "SELECT
     FROM ZSFNOTE";
 
 const BASE_TAG_QUERY: &str = "SELECT Z_PK, ZTITLE FROM ZSFNOTETAG ORDER BY ZTITLE";
-const BASE_NOTE_TAG_FILTER: &str = "SELECT
+// Only a partial query, the full query is constructed in `apply_filters`
+const NOTE_TAG_PARTIAL: &str = "SELECT
     Z_6NOTES FROM Z_6TAGS
-    WHERE Z_13TAGS IN";
+    WHERE Z_13TAGS IN
+    (SELECT Z_PK FROM ZSFNOTETAG WHERE ZTITLE IN";
 
 
 /// Detect and connect to the Bear application sqlite database.
@@ -51,11 +53,7 @@ fn apply_filters(query: &str, filters: &[NoteStatus], tags: &[String]) -> String
     }
 
     if !tags.is_empty() {
-        let tag_filter = format!(
-            "Z_PK IN ({} (SELECT Z_PK FROM ZSFNOTETAG WHERE ZTITLE IN (\"{}\")))",
-            BASE_NOTE_TAG_FILTER,
-            tags.join("\",\"")
-        );
+        let tag_filter = format!("Z_PK IN ({} (\"{}\")))", NOTE_TAG_PARTIAL, tags.join("\",\""));
 
         if !filter_sql.is_empty() {
             query_str = format!("{} AND ({})", query_str, tag_filter);

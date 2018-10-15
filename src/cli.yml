@@ -1,5 +1,5 @@
 name: cub
-version: "0.2.1"
+version: "0.2.2"
 author: Andrew Huynh <a5thuynh@gmail.com>
 about: Command-line Utility for Bear.
 args:

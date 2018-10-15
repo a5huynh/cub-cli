@@ -45,7 +45,6 @@ pub fn parse_tags(matches: &clap::ArgMatches) -> Vec<String> {
     if matches.is_present("tags") {
         let matched = matches.values_of("tags").unwrap();
         for tag in matched {
-            println!("{}", tag);
             tags.push(String::from(tag))
         }
     }

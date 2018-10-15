@@ -38,11 +38,26 @@ pub fn parse_limit(matches: &clap::ArgMatches) -> Limit {
     Limit::FINITE(100)
 }
 
+/// Parse tag strings
+pub fn parse_tags(matches: &clap::ArgMatches) -> Vec<String> {
+    let mut tags = Vec::new();
+
+    if matches.is_present("tags") {
+        let matched = matches.values_of("tags").unwrap();
+        for tag in matched {
+            println!("{}", tag);
+            tags.push(String::from(tag))
+        }
+    }
+
+    tags
+}
+
 #[cfg(test)]
 mod tests {
     use clap::App;
     use libcub::note::NoteStatus;
-    use args::{ Limit, parse_filters, parse_limit };
+    use args::{ Limit, parse_filters, parse_limit, parse_tags };
 
     #[test]
     fn test_parse_filters() {
@@ -86,5 +101,20 @@ mod tests {
             Limit::FINITE(val) => assert_eq!(val, 100),
             Limit::INFINITE => {}
         }
+    }
+
+    #[test]
+    fn test_parse_tags() {
+         let yaml = load_yaml!("cli.yml");
+        let app = App::from_yaml(yaml);
+
+        // Testing a valid limit value
+        let matches = app.get_matches_from(vec!["cub", "ls", "-t", "cooking", "-t", "drafts"]);
+        let subcommand = matches.subcommand_matches("ls").unwrap();
+        let tags = parse_tags(subcommand);
+
+        assert_eq!(tags.len(), 2);
+        assert_eq!(tags[0], "cooking");
+        assert_eq!(tags[1], "drafts");
     }
 }

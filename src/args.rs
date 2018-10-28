@@ -44,7 +44,9 @@ pub fn parse_sort(matches: &clap::ArgMatches) -> SortOrder {
 
     if matches.is_present("sort") {
         let sort_str = matches.value_of("sort").unwrap();
-        if sort_str == "title" {
+        if sort_str == "created" {
+            sort_order = SortOrder::DateCreated;
+        } else if sort_str == "title" {
             sort_order = SortOrder::Title;
         } else if sort_str == "updated" {
             sort_order = SortOrder::DateUpdated;

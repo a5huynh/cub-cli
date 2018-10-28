@@ -11,7 +11,9 @@ pub enum Limit {
     FINITE(i32)
 }
 
+#[derive(Debug, PartialEq)]
 pub enum SortOrder {
+    DateCreated,
     DateUpdated,
     Title
 }
@@ -68,6 +70,9 @@ fn apply_filters(query: &str, filters: &[NoteStatus], sort_order: &SortOrder, ta
     }
 
     match sort_order {
+        SortOrder::DateCreated => {
+            query_str = format!("{} ORDER BY ZCREATIONDATE DESC", query_str);
+        },
         SortOrder::DateUpdated => {
             query_str = format!("{} ORDER BY ZMODIFICATIONDATE DESC", query_str);
         },

@@ -2,7 +2,7 @@
 use clap;
 use libcub::note::NoteStatus;
 
-use libcub::{ Limit };
+use libcub::{ Limit, SortOrder };
 
 /// Create a list of filters from the command line args.
 pub fn parse_filters(matches: &clap::ArgMatches) -> Vec<NoteStatus> {
@@ -36,6 +36,22 @@ pub fn parse_limit(matches: &clap::ArgMatches) -> Limit {
     }
 
     Limit::FINITE(100)
+}
+
+/// Parse sort word
+pub fn parse_sort(matches: &clap::ArgMatches) -> SortOrder {
+    let mut sort_order = SortOrder::DateUpdated;
+
+    if matches.is_present("sort") {
+        let sort_str = matches.value_of("sort").unwrap();
+        if sort_str == "title" {
+            sort_order = SortOrder::Title;
+        } else if sort_str == "updated" {
+            sort_order = SortOrder::DateUpdated;
+        }
+    }
+
+    sort_order
 }
 
 /// Parse tag strings

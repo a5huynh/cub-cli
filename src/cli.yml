@@ -31,6 +31,10 @@ subcommands:
             help: Limit the number of notes printed.
             takes_value: true
             conflicts_with: all
+        - sort:
+            short: s
+            help: Sort by <updated (default)>, <title>
+            takes_value: true
         - tags:
             short: t
             help: Filter notes by tag

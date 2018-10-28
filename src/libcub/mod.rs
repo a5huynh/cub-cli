@@ -11,6 +11,11 @@ pub enum Limit {
     FINITE(i32)
 }
 
+pub enum SortOrder {
+    DateUpdated,
+    Title
+}
+
 const BASE_NOTE_QUERY: &str = "SELECT
         Z_PK,
         ZTITLE,

@@ -1,5 +1,5 @@
 name: cub
-version: "0.2.2"
+version: "0.3.0"
 author: Andrew Huynh <a5thuynh@gmail.com>
 about: Command-line Utility for Bear.
 args:
@@ -31,6 +31,10 @@ subcommands:
             help: Limit the number of notes printed.
             takes_value: true
             conflicts_with: all
+        - sort:
+            short: s
+            help: Sort by <updated (default)>, <title>
+            takes_value: true
         - tags:
             short: t
             help: Filter notes by tag

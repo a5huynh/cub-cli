@@ -13,6 +13,7 @@ mod args;
 use args::{
     parse_filters,
     parse_limit,
+    parse_sort,
     parse_tags,
 };
 
@@ -55,9 +56,10 @@ fn main() {
 
         let filters = parse_filters(matches);
         let limit = parse_limit(matches);
+        let sort = parse_sort(matches);
         let tags = parse_tags(matches);
 
-        for note in list_notes(&conn, &filters, &tags, &limit).unwrap() {
+        for note in list_notes(&conn, &filters, &sort, &tags, &limit).unwrap() {
             // Color the notes depending on the note status
             if matches.is_present("color") {
                 match note.status {

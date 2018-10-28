@@ -2,7 +2,7 @@
 use clap;
 use libcub::note::NoteStatus;
 
-use libcub::{ Limit };
+use libcub::{ Limit, SortOrder };
 
 /// Create a list of filters from the command line args.
 pub fn parse_filters(matches: &clap::ArgMatches) -> Vec<NoteStatus> {
@@ -38,6 +38,24 @@ pub fn parse_limit(matches: &clap::ArgMatches) -> Limit {
     Limit::FINITE(100)
 }
 
+/// Parse sort word
+pub fn parse_sort(matches: &clap::ArgMatches) -> SortOrder {
+    let mut sort_order = SortOrder::DateUpdated;
+
+    if matches.is_present("sort") {
+        let sort_str = matches.value_of("sort").unwrap();
+        if sort_str == "created" {
+            sort_order = SortOrder::DateCreated;
+        } else if sort_str == "title" {
+            sort_order = SortOrder::Title;
+        } else if sort_str == "updated" {
+            sort_order = SortOrder::DateUpdated;
+        }
+    }
+
+    sort_order
+}
+
 /// Parse tag strings
 pub fn parse_tags(matches: &clap::ArgMatches) -> Vec<String> {
     let mut tags = Vec::new();
@@ -56,7 +74,14 @@ pub fn parse_tags(matches: &clap::ArgMatches) -> Vec<String> {
 mod tests {
     use clap::App;
     use libcub::note::NoteStatus;
-    use args::{ Limit, parse_filters, parse_limit, parse_tags };
+    use args::{
+        Limit,
+        SortOrder,
+        parse_filters,
+        parse_limit,
+        parse_sort,
+        parse_tags
+    };
 
     #[test]
     fn test_parse_filters() {
@@ -103,8 +128,21 @@ mod tests {
     }
 
     #[test]
+    fn test_parse_sort() {
+        let yaml = load_yaml!("cli.yml");
+        let app = App::from_yaml(yaml);
+
+        // Testing a valid limit value
+        let matches = app.get_matches_from(vec!["cub", "ls", "-s", "created"]);
+        let subcommand = matches.subcommand_matches("ls").unwrap();
+        let sort = parse_sort(subcommand);
+
+        assert_eq!(sort, SortOrder::DateCreated);
+    }
+
+    #[test]
     fn test_parse_tags() {
-         let yaml = load_yaml!("cli.yml");
+        let yaml = load_yaml!("cli.yml");
         let app = App::from_yaml(yaml);
 
         // Testing a valid limit value

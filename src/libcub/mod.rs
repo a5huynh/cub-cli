@@ -41,7 +41,7 @@ pub fn connect_to_db(datafile: &str) -> Connection {
     Connection::open(datafile).unwrap()
 }
 
-fn apply_filters(query: &str, filters: &[NoteStatus], tags: &[String]) -> String {
+fn apply_filters(query: &str, filters: &[NoteStatus], sort_order: &SortOrder, tags: &[String]) -> String {
     let mut filter_sql = Vec::new();
     let mut query_str = String::from(query);
 
@@ -67,6 +67,15 @@ fn apply_filters(query: &str, filters: &[NoteStatus], tags: &[String]) -> String
         }
     }
 
+    match sort_order {
+        SortOrder::DateUpdated => {
+            query_str = format!("{} ORDER BY ZMODIFICATIONDATE DESC", query_str);
+        },
+        SortOrder::Title => {
+            query_str = format!("{} ORDER BY ZTITLE", query_str);
+        }
+    }
+
     query_str
 }
 
@@ -86,10 +95,11 @@ pub fn find_note_by_id(conn: &Connection, note_id: i32) -> Result<Note, &'static
 pub fn list_notes(
     conn: &Connection,
     filters: &[NoteStatus],
+    sort_order: &SortOrder,
     tags: &[String],
     limit: &Limit
 ) -> Result<Vec<Note>, &'static str> {
-    let applied = apply_filters(&BASE_NOTE_QUERY, filters, tags);
+    let applied = apply_filters(&BASE_NOTE_QUERY, filters, sort_order, tags);
 
     let mut notes = Vec::new();
 

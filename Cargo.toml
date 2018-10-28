@@ -7,11 +7,11 @@ publish = false
 [dependencies]
 chrono = "0.4.6"
 clap = { version = "2.32.0", features = ["yaml"] }
-env_logger = "0.5.11"
-dirs = "1.0.2"
-log = "0.4.3"
-rusqlite = "0.14.0"
-term = "0.4.6"
+env_logger = "0.5.13"
+dirs = "1.0.4"
+log = "0.4.5"
+rusqlite = "0.15.0"
+term = "0.5.1"
 
 [lib]
 name = "libcub"

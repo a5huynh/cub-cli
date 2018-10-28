@@ -1,6 +1,6 @@
 extern crate chrono;
 extern crate rusqlite;
-use rusqlite::{ Connection };
+use rusqlite::{ Connection, NO_PARAMS };
 
 pub mod constants;
 pub mod note;
@@ -113,7 +113,7 @@ pub fn list_notes(
         Limit::INFINITE => {
             let mut stmt = conn.prepare(&applied.as_str())
                 .unwrap();
-            let note_iter = stmt.query_map(&[], |row| Note::from_sql(row))
+            let note_iter = stmt.query_map(NO_PARAMS, |row| Note::from_sql(row))
                 .unwrap();
             for note in note_iter {
                 notes.push(note.unwrap());
@@ -139,7 +139,7 @@ pub fn list_tags(conn: &Connection) -> Result<Vec<Tag>, &'static str> {
     let mut stmt = conn.prepare(BASE_TAG_QUERY).unwrap();
     let mut tags = Vec::new();
 
-    let tag_iter = stmt.query_map(&[], |row| Tag::from_sql(row)).unwrap();
+    let tag_iter = stmt.query_map(NO_PARAMS, |row| Tag::from_sql(row)).unwrap();
     for tag in tag_iter {
         tags.push(tag.unwrap());
     }

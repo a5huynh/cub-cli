@@ -74,7 +74,14 @@ pub fn parse_tags(matches: &clap::ArgMatches) -> Vec<String> {
 mod tests {
     use clap::App;
     use libcub::note::NoteStatus;
-    use args::{ Limit, parse_filters, parse_limit, parse_tags };
+    use args::{
+        Limit,
+        SortOrder,
+        parse_filters,
+        parse_limit,
+        parse_sort,
+        parse_tags
+    };
 
     #[test]
     fn test_parse_filters() {
@@ -121,8 +128,21 @@ mod tests {
     }
 
     #[test]
+    fn test_parse_sort() {
+        let yaml = load_yaml!("cli.yml");
+        let app = App::from_yaml(yaml);
+
+        // Testing a valid limit value
+        let matches = app.get_matches_from(vec!["cub", "ls", "-s", "created"]);
+        let subcommand = matches.subcommand_matches("ls").unwrap();
+        let sort = parse_sort(subcommand);
+
+        assert_eq!(sort, SortOrder::DateCreated);
+    }
+
+    #[test]
     fn test_parse_tags() {
-         let yaml = load_yaml!("cli.yml");
+        let yaml = load_yaml!("cli.yml");
         let app = App::from_yaml(yaml);
 
         // Testing a valid limit value

@@ -20,8 +20,8 @@ to the notes, tags, and media stored within your bear writer application.
 
 
 ## Installing
-
-    brew install cub-cli
+    brew tap a5huynh/brew
+    brew install a5huynh/brew/cub-cli
 
 
 ## How to do things

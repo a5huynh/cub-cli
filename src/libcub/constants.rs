@@ -1,9 +1,9 @@
 extern crate dirs;
 use std::path::Path;
 
-static APP_PATHS: [&'static str; 2] = [
+static APP_PATHS: [&str; 2] = [
     "Library/Containers/net.shinyfrog.bear/Data/Documents",
-    "Library/Group Containers/9K33E3U3T4.net.shinyfrog.bear"
+    "Library/Group Containers/9K33E3U3T4.net.shinyfrog.bear",
 ];
 
 const DB_PATH: &str = "Application Data/database.sqlite";

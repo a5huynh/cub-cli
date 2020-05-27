@@ -1,21 +1,21 @@
 extern crate chrono;
 extern crate rusqlite;
-use rusqlite::{ Connection, NO_PARAMS };
+use rusqlite::{Connection, NO_PARAMS};
 
 pub mod constants;
 pub mod note;
-use self::note::{ Note, NoteStatus, Tag };
+use self::note::{Note, NoteStatus, Tag};
 
 pub enum Limit {
     INFINITE,
-    FINITE(i32)
+    FINITE(i32),
 }
 
 #[derive(Debug, PartialEq)]
 pub enum SortOrder {
     DateCreated,
     DateUpdated,
-    Title
+    Title,
 }
 
 const BASE_NOTE_QUERY: &str = "SELECT
@@ -37,13 +37,17 @@ const NOTE_TAG_PARTIAL: &str = "SELECT
     WHERE Z_13TAGS IN
     (SELECT Z_PK FROM ZSFNOTETAG WHERE ZTITLE IN";
 
-
 /// Detect and connect to the Bear application sqlite database.
 pub fn connect_to_db(datafile: &str) -> Connection {
     Connection::open(datafile).unwrap()
 }
 
-fn apply_filters(query: &str, filters: &[NoteStatus], sort_order: &SortOrder, tags: &[String]) -> String {
+fn apply_filters(
+    query: &str,
+    filters: &[NoteStatus],
+    sort_order: &SortOrder,
+    tags: &[String],
+) -> String {
     let mut filter_sql = Vec::new();
     let mut query_str = String::from(query);
 
@@ -60,7 +64,11 @@ fn apply_filters(query: &str, filters: &[NoteStatus], sort_order: &SortOrder, ta
     }
 
     if !tags.is_empty() {
-        let tag_filter = format!("Z_PK IN ({} (\"{}\")))", NOTE_TAG_PARTIAL, tags.join("\",\""));
+        let tag_filter = format!(
+            "Z_PK IN ({} (\"{}\")))",
+            NOTE_TAG_PARTIAL,
+            tags.join("\",\"")
+        );
 
         if !filter_sql.is_empty() {
             query_str = format!("{} AND ({})", query_str, tag_filter);
@@ -72,10 +80,10 @@ fn apply_filters(query: &str, filters: &[NoteStatus], sort_order: &SortOrder, ta
     match sort_order {
         SortOrder::DateCreated => {
             query_str = format!("{} ORDER BY ZCREATIONDATE DESC", query_str);
-        },
+        }
         SortOrder::DateUpdated => {
             query_str = format!("{} ORDER BY ZMODIFICATIONDATE DESC", query_str);
-        },
+        }
         SortOrder::Title => {
             query_str = format!("{} ORDER BY ZTITLE", query_str);
         }
@@ -84,17 +92,17 @@ fn apply_filters(query: &str, filters: &[NoteStatus], sort_order: &SortOrder, ta
     query_str
 }
 
-
 /// Find a single note by ID
 pub fn find_note_by_id(conn: &Connection, note_id: i32) -> Result<Note, &'static str> {
-    let mut stmt = conn.prepare(format!("{} WHERE Z_PK =?", BASE_NOTE_QUERY).as_str()).unwrap();
-    let note = stmt.query_row(&[&note_id], |row| {
-        Note::from_sql(row)
-    }).unwrap();
+    let mut stmt = conn
+        .prepare(format!("{} WHERE Z_PK =?", BASE_NOTE_QUERY).as_str())
+        .unwrap();
+    let note = stmt
+        .query_row(&[&note_id], |row| Note::from_sql(row))
+        .unwrap();
 
     Ok(note)
 }
-
 
 /// List all notes
 pub fn list_notes(
@@ -102,7 +110,7 @@ pub fn list_notes(
     filters: &[NoteStatus],
     sort_order: &SortOrder,
     tags: &[String],
-    limit: &Limit
+    limit: &Limit,
 ) -> Result<Vec<Note>, &'static str> {
     let applied = apply_filters(&BASE_NOTE_QUERY, filters, sort_order, tags);
 
@@ -111,20 +119,20 @@ pub fn list_notes(
     match limit {
         // Show all notes
         Limit::INFINITE => {
-            let mut stmt = conn.prepare(&applied.as_str())
-                .unwrap();
-            let note_iter = stmt.query_map(NO_PARAMS, |row| Note::from_sql(row))
+            let mut stmt = conn.prepare(&applied.as_str()).unwrap();
+            let note_iter = stmt
+                .query_map(NO_PARAMS, |row| Note::from_sql(row))
                 .unwrap();
             for note in note_iter {
                 notes.push(note.unwrap());
             }
-        },
+        }
         // Apply limit to number of notes returned
         Limit::FINITE(val) => {
-            let mut stmt = conn.prepare(format!("{} LIMIT ?", &applied.as_str()).as_str())
+            let mut stmt = conn
+                .prepare(format!("{} LIMIT ?", &applied.as_str()).as_str())
                 .unwrap();
-            let note_iter = stmt.query_map(&[val], |row| Note::from_sql(row))
-                .unwrap();
+            let note_iter = stmt.query_map(&[val], |row| Note::from_sql(row)).unwrap();
             for note in note_iter {
                 notes.push(note.unwrap());
             }

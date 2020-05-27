@@ -10,22 +10,12 @@ use clap::App;
 use std::io::prelude::*;
 
 mod args;
-use args::{
-    parse_filters,
-    parse_limit,
-    parse_sort,
-    parse_tags,
-};
+use args::{parse_filters, parse_limit, parse_sort, parse_tags};
 
 extern crate libcub;
-use libcub::{
-    connect_to_db,
-    find_note_by_id,
-    list_notes,
-    list_tags,
-};
-use libcub::constants::{ find_db };
+use libcub::constants::find_db;
 use libcub::note::NoteStatus;
+use libcub::{connect_to_db, find_note_by_id, list_notes, list_tags};
 
 fn main() {
     env_logger::init();
@@ -44,7 +34,9 @@ fn main() {
         }
     };
 
-    let db_opt = matches.value_of("db").unwrap_or_else(|| db_file_path.as_str());
+    let db_opt = matches
+        .value_of("db")
+        .unwrap_or_else(|| db_file_path.as_str());
 
     info!("db path set to: {}", db_opt);
 
@@ -53,7 +45,6 @@ fn main() {
 
     // Parse command line args and determine which subcommand to execute.
     if let Some(matches) = matches.subcommand_matches("ls") {
-
         let filters = parse_filters(matches);
         let limit = parse_limit(matches);
         let sort = parse_sort(matches);
@@ -71,7 +62,12 @@ fn main() {
 
             writeln!(t, "{}", note).unwrap();
             if matches.is_present("full") {
-                writeln!(t, "{}", note.subtitle).unwrap();
+                writeln!(
+                    t,
+                    "{}",
+                    note.subtitle.unwrap_or_else(|| String::from("N/A"))
+                )
+                .unwrap();
             }
 
             // Unset any coloring we did
@@ -79,9 +75,7 @@ fn main() {
                 t.reset().unwrap();
             }
         }
-
     } else if let Some(matches) = matches.subcommand_matches("show") {
-
         let note_id: i32 = match matches.value_of("NOTE").unwrap().parse() {
             Ok(value) => value,
             Err(_) => {
@@ -91,8 +85,7 @@ fn main() {
         };
 
         let note = find_note_by_id(&conn, note_id).unwrap();
-        writeln!(t, "{}", note.text).unwrap();
-
+        writeln!(t, "{}", note.text.unwrap_or_else(|| String::from("N/A"))).unwrap();
     } else if matches.subcommand_matches("tags").is_some() {
         for tag in list_tags(&conn).unwrap() {
             writeln!(t, "{}", tag.title).unwrap();

@@ -5,12 +5,12 @@ authors = ["Andrew Huynh <a5thuynh@gmail.com>"]
 publish = false
 
 [dependencies]
-chrono = "0.4.11"
-clap = { version = "2.33.1", features = ["yaml"] }
+chrono = "0.4.19"
+clap = { version = "2.33.3", features = ["yaml"] }
 env_logger = "0.7.1"
-dirs = "2.0.2"
-log = "0.4.8"
-rusqlite = "0.23.1"
+dirs = "3.0.1"
+log = "0.4.11"
+rusqlite = "0.24.0"
 term = "0.6.1"
 
 [lib]

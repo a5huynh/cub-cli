@@ -10,7 +10,7 @@ use clap::App;
 use std::io::prelude::*;
 
 mod args;
-use args::{parse_filters, parse_limit, parse_sort, parse_tags};
+use crate::args::{parse_filters, parse_limit, parse_sort, parse_tags};
 
 extern crate libcub;
 use libcub::constants::find_db;

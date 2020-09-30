@@ -1,13 +1,14 @@
-extern crate rusqlite;
 extern crate libcub;
+extern crate rusqlite;
 
-use rusqlite::{params, Connection};
 use libcub::{list_notes, Limit, SortOrder};
+use rusqlite::{params, Connection};
 
 /// Bootstraps a test db with a table with a similar schema to the Bear notes db
 /// and some notes.
 fn bootstrap(conn: &Connection) {
-    conn.execute("CREATE TABLE ZSFNOTE (
+    conn.execute(
+        "CREATE TABLE ZSFNOTE (
             Z_PK                INTEGER PRIMARY KEY,
             ZARCHIVED           INTEGER,
             ZTITLE              VARCHAR,
@@ -18,7 +19,8 @@ fn bootstrap(conn: &Connection) {
             ZMODIFICATIONDATE   TIMESTAMP,
             ZTRASHED            INTEGER)",
         params![],
-    ).unwrap();
+    )
+    .unwrap();
 
     conn.execute(
         "INSERT INTO ZSFNOTE (
@@ -27,8 +29,9 @@ fn bootstrap(conn: &Connection) {
         ) VALUES (
             1, 0, 'title', 'subtitle', 'text body', 'device', 0, 0, 0
         )",
-        params![]
-    ).unwrap();
+        params![],
+    )
+    .unwrap();
 
     conn.execute(
         "INSERT INTO ZSFNOTE (
@@ -37,9 +40,9 @@ fn bootstrap(conn: &Connection) {
         ) VALUES (
             2, 0, 'title', NULL, NULL, 'device', 0, 0, 0
         )",
-        params![]
-    ).unwrap();
-
+        params![],
+    )
+    .unwrap();
 }
 
 #[test]

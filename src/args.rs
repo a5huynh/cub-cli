@@ -72,7 +72,7 @@ pub fn parse_tags(matches: &clap::ArgMatches) -> Vec<String> {
 
 #[cfg(test)]
 mod tests {
-    use args::{parse_filters, parse_limit, parse_sort, parse_tags, Limit, SortOrder};
+    use crate::args::{parse_filters, parse_limit, parse_sort, parse_tags, Limit, SortOrder};
     use clap::App;
     use libcub::note::NoteStatus;
 

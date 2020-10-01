@@ -56,4 +56,4 @@ Here is how to do some common things with the `cub` CLI. Also check out
 CUB is build using the latest stable version of rust-lang and can be built
 from scratch using the following command:
 
-    cargo build
+    cargo build --release

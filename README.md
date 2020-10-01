@@ -2,10 +2,10 @@
 
 ## CUB
 
-CUB stands for Command-line Utility for [Bear][bear-app] and offers a simple CLI interface
+CUB stands for **C**ommand-line **U**tility for [**B**ear][bear-app] and offers a simple CLI interface
 to the notes, tags, and media stored within your bear writer application.
 
-[bear-app]: https://bear-writer.com
+[bear-app]: https://bear.app/
 
 ## TODO
 - [ ] List notes.

@@ -33,8 +33,8 @@ const BASE_NOTE_QUERY: &str = "SELECT
 const BASE_TAG_QUERY: &str = "SELECT Z_PK, ZTITLE FROM ZSFNOTETAG ORDER BY ZTITLE";
 // Only a partial query, the full query is constructed in `apply_filters`
 const NOTE_TAG_PARTIAL: &str = "SELECT
-    Z_6NOTES FROM Z_6TAGS
-    WHERE Z_13TAGS IN
+    Z_7NOTES FROM Z_7TAGS
+    WHERE Z_14TAGS IN
     (SELECT Z_PK FROM ZSFNOTETAG WHERE ZTITLE IN";
 
 /// Detect and connect to the Bear application sqlite database.

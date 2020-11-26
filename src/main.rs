@@ -17,6 +17,10 @@ use libcub::constants::find_db;
 use libcub::note::NoteStatus;
 use libcub::{connect_to_db, find_note_by_id, list_notes, list_tags};
 
+use std::fs::File;
+use std::io::prelude::*;
+use std::path::Path;
+
 fn main() {
     env_logger::init();
     let yaml = load_yaml!("cli.yml");
@@ -86,6 +90,14 @@ fn main() {
 
         let note = find_note_by_id(&conn, note_id).unwrap();
         writeln!(t, "{}", note.text.unwrap_or_else(|| String::from("N/A"))).unwrap();
+    } else if let Some(matches) = matches.subcommand_matches("export") {
+        let filters = parse_filters(matches);
+        let limit = parse_limit(matches);
+        let sort = parse_sort(matches);
+        let tags = parse_tags(matches);
+        let notes = list_notes(&conn, &filters, &sort, &tags, &limit).unwrap();
+
+        writeln!(t, "Exported {} notes to Markdown files.", notes.len()).unwrap();
     } else if matches.subcommand_matches("tags").is_some() {
         for tag in list_tags(&conn).unwrap() {
             writeln!(t, "{}", tag.title).unwrap();

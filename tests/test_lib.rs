@@ -53,3 +53,12 @@ fn test_list_notes() {
     let notes = list_notes(&conn, &[], &SortOrder::Title, &[], &Limit::INFINITE).unwrap();
     assert_eq!(notes.len(), 2);
 }
+
+// #[test]
+// fn test_export_notes() {
+//     let conn = Connection::open_in_memory().unwrap();
+//     bootstrap(&conn);
+
+//     let notes = list_notes(&conn, &[], &SortOrder::Title, &[], &Limit::INFINITE).unwrap();
+//     assert_eq!(notes.len(), 2);
+// }

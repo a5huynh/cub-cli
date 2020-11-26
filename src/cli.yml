@@ -49,3 +49,5 @@ subcommands:
             index: 1
   - tags:
       about: Show tags
+  - export:
+      about: Export notes.
